@@ -18,7 +18,7 @@ resource "aws_security_group" "web_sg" {
 
 #------EC2 Instance with simple web server------
 resource "aws_instance" "web_server" {
-  ami                    = "ami-0c94855ba95c71c99"
+ami                    = "ami-0ab2a14ef6590f317"
  instance_type          = "t2.micro"
  vpc_security_group_ids = [aws_security_group.web_sg.id]  
   user_data = <<-EOF
