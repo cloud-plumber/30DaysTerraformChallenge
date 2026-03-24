@@ -9,8 +9,8 @@ resource "aws_security_group" "web_sg" {
   description = "Allow HTTP traffic"
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -20,7 +20,7 @@ resource "aws_security_group" "web_sg" {
 resource "aws_instance" "web_server" {
 ami                    = "ami-02dfbd4ff395f2a1b"
  instance_type          = "t3.micro"
- vpc_security_group_ids = [aws_security_group.web_sg.id]  
+vpc_security_group_ids = [aws_security_group.web_sg.id]  
 user_data = <<-EOF
  #!/bin/bash
 yum update -y
