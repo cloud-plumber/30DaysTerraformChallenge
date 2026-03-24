@@ -9,8 +9,8 @@ resource "aws_security_group" "web_sg" {
   description = "Allow HTTP traffic"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -25,6 +25,9 @@ user_data = <<-EOF
  #!/bin/bash
 yum update -y
 yum install -y httpd
+
+#Change Apache to listen on port 8080
+sed -i 's/^Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
 
 systemctl start httpd
 systemctl enable httpd
