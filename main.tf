@@ -6,7 +6,7 @@ provider "aws" {
 #------Create a security group for the web server------
 resource "aws_security_group" "web_sg" {
   name        = var.aws_security_group  
-  description = var.aws_security_group
+  description = "Allow HTTP traffic"
 
   ingress {
     from_port   = var.server_port
@@ -49,12 +49,12 @@ resource "aws_security_group" "web_sg" {
 } */
 
 #------Launch Configuration for Auto Scaling Group------
-resource "aws_launch_configuration" "launch_configuration_example" {
-  name          = "example-launch-configuration"
+resource "aws_launch_template" "template_example" {
+  name_prefix          = "example-launch-configuration"
   image_id      = var.ami
   instance_type = var.instance_type
-  security_groups = [aws_security_group.web_sg.id]
-  user_data = <<-EOF
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  user_data =base64encode(<<-EOF
   #!/bin/bash
   yum update -y
   yum install -y httpd
@@ -66,6 +66,7 @@ resource "aws_launch_configuration" "launch_configuration_example" {
   systemctl enable httpd
   echo "<h1>Welcome to my Terraform-deployed server 🚀</h1>" > /var/www/html/index.html
   EOF
+  )
   
  /*To ensure that the launch configuration is recreated if the user data changes, we can use the lifecycle block with create_before_destroy set to true.
  This will allow Terraform to create a new launch configuration before destroying the old one, ensuring that there is no downtime for the Auto Scaling Group.*/
@@ -75,8 +76,11 @@ resource "aws_launch_configuration" "launch_configuration_example" {
 }
 #------Auto Scaling Group------
 resource "aws_autoscaling_group" "asg-example" {
-  launch_configuration = aws_launch_configuration.launch_configuration_example.name
   vpc_zone_identifier = data.aws_subnets.default.ids
+  launch_template {
+    id = aws_launch_template.template_example.id
+    version = "$Latest"
+  }
   min_size = 2
   max_size = 10
   tag {
