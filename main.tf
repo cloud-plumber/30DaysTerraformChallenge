@@ -104,7 +104,6 @@ data "aws_subnets" "default" {
   }
 }
 
-
 ######------Create an Application Load Balancer and related resources------
 #-------Create an Application Load Balancer------
 resource "aws_lb" "alb_example" {
